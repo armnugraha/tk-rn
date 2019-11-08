@@ -48,8 +48,7 @@ class MainScreen extends React.Component {
   }
 
   _moveToAntiqueruby() {
-    AsyncStorage.multiSet([["FirstAntiqueruby", "true"]]);
-    this.props.navigation.navigate("DrawerStackAntiqueruby");
+    this.props.navigation.navigate("TransactionScan");
   }
 
   _moveToECommerce() {
@@ -104,7 +103,7 @@ class MainScreen extends React.Component {
                 style={styles.btnStyle}
                 onPress={() => this._moveToAntiqueruby()}
               >
-                <Text style={styles.buttonText}>General Material UI</Text>
+                <Text style={styles.buttonText}>Tambah Transaksi</Text>
               </TouchableOpacity>
 
               <View style={styles.btnsec}>
@@ -112,7 +111,7 @@ class MainScreen extends React.Component {
                   style={styles.btnStyle}
                   onPress={() => this._moveToECommerce()}
                 >
-                  <Text style={styles.buttonText}>ECommerce Material UI</Text>
+                  <Text style={styles.buttonText}>Cetak Transaksi</Text>
                 </TouchableOpacity>
               </View>
 
@@ -134,32 +133,6 @@ class MainScreen extends React.Component {
                 </TouchableOpacity>
               </View>
 
-              <View style={styles.btnsec}>
-                <TouchableOpacity
-                  style={styles.btnStyle}
-                  onPress={() => this._moveToBlog()}
-                >
-                  <Text style={styles.buttonText}>Wordpress Blog</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.btnsec}>
-                <TouchableOpacity
-                  style={styles.btnStyle}
-                  onPress={() => this._moveToBubbdy()}
-                >
-                  <Text style={styles.buttonText}>Bubbdy Material UI</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.btnsec}>
-                <TouchableOpacity
-                  style={styles.btnStyle}
-                  onPress={() => this._moveToTraveling()}
-                >
-                  <Text style={styles.buttonText}>Traveling Material UI</Text>
-                </TouchableOpacity>
-              </View>
             </View>
           </View>
         </Content>

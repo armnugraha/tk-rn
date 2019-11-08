@@ -8,13 +8,13 @@ import FirstScreen from "../Containers/MainScreen/MainScreen";
 /* Antiqueruby Screens List START */
 
 //main screens
-import AppScan from "../../AppScan";
+import TransactionScan from "../Containers/TransactionScreen/";
 
 // main stack
 const MainStack = createStackNavigator(
   {
     FirstScreen: { screen: FirstScreen },
-    AppScan: { screen: AppScan }
+    TransactionScan: { screen: TransactionScan }
   },
   {
     headerMode: "none",
