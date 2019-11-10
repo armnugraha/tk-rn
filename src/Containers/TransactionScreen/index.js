@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 // eslint-disable-next-line import/no-unresolved
 import { RNCamera } from 'react-native-camera';
-import { Container, Content, List, ListItem, Button } from 'native-base';
+import { Container, Header, Content, List, ListItem, Button, Tab, Tabs, TabHeading, Left, Body, Right, Title, Item, Input } from 'native-base';
 import { FlatList } from 'react-native-gesture-handler';
 
 const flashModeOrder = {
@@ -95,10 +95,9 @@ export default class CameraScreen extends React.Component {
   onBarCodeRead = (e) => {alert("Barcode value is" + e.data, "Barcode type is" + e.type);}
 
   renderCamera() {
-    const { canDetectBarcode } = this.state;
-
+    
     const drawFocusRingPosition = {
-      top: this.state.autoFocusPoint.drawRectPosition.y - 32,
+      top: this.state.autoFocusPoint.drawRectPosition.y - 152,
       left: this.state.autoFocusPoint.drawRectPosition.x - 32,
     };
     return (
@@ -172,28 +171,57 @@ export default class CameraScreen extends React.Component {
     return (
 		<Container>
 
-			<View style={{height:"50%"}}>
-				{this.renderCamera()}
-			</View>
+            <Header hasTabs>
+                <Left/>
+                <Body>
+                    <Title>Transaksi</Title>
+                </Body>
+                <Right />
+            </Header>
 
-			<Content>
-				<FlatList
-					data={this.state.listTransaction}
-                    renderItem = {({item, index}) => (
-                        <List style={{backgroundColor:"red"}}>
-							<ListItem>
-								<Text>{item.name}</Text>
-							</ListItem>
-						</List>
-                    )
-                    }
-                    keyExtractor = {(item, index) => index.toString()}
-				/>
+            <Tabs>
 
-				<Button onPress={() => this.setState({listTransaction: [...this.state.listTransaction, {name:"arman"} ] }) }>
-					<Text>add1</Text>
-				</Button>
-			</Content>
+                <Tab heading={ <TabHeading><Text>Tambah Barang</Text></TabHeading>}>
+                    
+                    <View style={{height:"50%", marginBottom:20}}>
+				        {this.renderCamera()}
+			        </View>
+
+                    <Item regular style={{backgroundColor:"#FFF"}}>
+                        <Input placeholder='Rounded Textbox'/>
+                    </Item>
+                    <Content>
+                        
+                    </Content>
+
+                </Tab>
+
+                <Tab heading={ <TabHeading><Text>List</Text></TabHeading>}>
+                    
+                    <Content>
+
+                        <FlatList
+                            data={this.state.listTransaction}
+                            renderItem = {({item, index}) => (
+                                <List style={{backgroundColor:"red"}}>
+                                    <ListItem>
+                                        <Text>{item.name}</Text>
+                                    </ListItem>
+                                </List>
+                            )
+                            }
+                            keyExtractor = {(item, index) => index.toString()}
+                        />
+
+                        <Button onPress={() => this.setState({listTransaction: [...this.state.listTransaction, {name:"arman"} ] }) }>
+                            <Text>add1</Text>
+                        </Button>
+
+                    </Content>
+
+                </Tab>
+
+            </Tabs>
 
 		</Container>
 	);

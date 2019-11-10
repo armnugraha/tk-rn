@@ -31,6 +31,7 @@ import styles from "./styles";
 import {Fonts, Metrics, Colors } from "../../styles/Themes/";
 
 class MainScreen extends React.Component {
+
   componentWillMount() {
     var that = this;
     BackHandler.addEventListener("hardwareBackPress", function() {
