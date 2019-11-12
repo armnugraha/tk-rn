@@ -7,18 +7,19 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Dimensions,
+  ToastAndroid,
+  ActivityIndicator
 } from 'react-native';
 // eslint-disable-next-line import/no-unresolved
 import { RNCamera } from 'react-native-camera';
-import { Container, Header, Content, List, ListItem, Button, Tab, Tabs, TabHeading, Left, Body, Right, Title, Item, Input } from 'native-base';
+import { Container, Header, Content, List, ListItem, Button, Tab, Tabs, TabHeading, Left, Body, Right, Title, Item, Input, Footer, FooterTab, Separator, Card, CardItem } from 'native-base';
 import { FlatList } from 'react-native-gesture-handler';
+import Api from '../../libs/Api';
 
 const flashModeOrder = {
   off: 'torch',
   torch: 'off',
 };
-
-const landmarkSize = 2;
 
 export default class CameraScreen extends React.Component {
 	state = {
@@ -37,7 +38,23 @@ export default class CameraScreen extends React.Component {
 		whiteBalance: 'auto',
 		ratio: '16:9',
 		barcodes: [],
-		listTransaction: [{name:"ar"}],
+        listTransaction: [{name:"ar"}],
+        loading:false,
+        itemProduct:[],
+
+        itemHrgPcs:0,
+        itemHrgDz:0,
+        itemHrgBx:0,
+        itemHrgPck:0,
+        
+        totalItem:0,
+        
+        name_product:"",
+        jml_product:0,
+        satuan_product:"",
+        satuan_hrg_product:0,
+
+        totalCalculate:0,
 	};
 
   toggleFlash() {
@@ -167,11 +184,38 @@ export default class CameraScreen extends React.Component {
     );
   }
 
+  getProduct(value){
+
+    this.setState({loading:true})
+
+    Api.get("/api/v1/getProduct/" + value).then(resp =>{
+        this.setState({itemProduct: resp.data})
+        this.setState({loading:false})
+    })
+    .catch(error =>{
+        ToastAndroid.show("'"+error+"'", ToastAndroid.SHORT)
+    });
+
+  }
+
+  changeList(item){
+      this.setState({name_product: item.name, itemHrgPcs:item.pcs_price, itemHrgDz:item.dozen_price, itemHrgPck:item.pack_price, itemHrgBx:item.box_price, })
+  }
+
+  totalCalculate(value){
+      this.setState({totalCalculate: value})
+  }
+
+  renderLoading(){
+      if(this.state.loading)
+        return <ActivityIndicator />
+  }
+
   render() {
     return (
 		<Container>
 
-            <Header hasTabs>
+            <Header hasTabs style={{marginTop:16}}>
                 <Left/>
                 <Body>
                     <Title>Transaksi</Title>
@@ -183,16 +227,147 @@ export default class CameraScreen extends React.Component {
 
                 <Tab heading={ <TabHeading><Text>Tambah Barang</Text></TabHeading>}>
                     
-                    <View style={{height:"50%"}}>
+                    {/* <View style={{height:"50%"}}>
 				        {this.renderCamera()}
-			        </View>
+			        </View> */}
 
                     <Item regular style={{backgroundColor:"#FFF"}}>
-                        <Input placeholder='Rounded Textbox'/>
+                        <Input placeholder='Barcode'
+                            onChangeText={(text) => { text.length > 2 ? this.getProduct(text) : null }}
+                            keyboardType='numeric'
+                        />
                     </Item>
+
+                    <View style={{height:128}}>
+
+                        <Content>
+
+                            {this.renderLoading()}
+
+                            <FlatList
+                                extraData={this.state}
+                                data={this.state.itemProduct}
+                                renderItem = {({item, index}) => (
+
+                                    <TouchableOpacity
+                                        onPress={() => this.changeList(item)}
+                                    >
+                                        <Card transparent>
+                                            <CardItem>
+                                                <Text>{item.name}</Text>
+                                            </CardItem>
+                                        </Card>
+                                    </TouchableOpacity>
+
+                                )}
+                                keyExtractor = {(item, index) => index.toString()}
+                            />
+
+                        </Content>
+                        
+                    </View>
+
                     <Content>
 
+                        <Separator bordered>
+                            <View style={{flex: 1,flexDirection: 'row',alignItems: 'center',justifyContent: 'center'}}>
+                                <View style={{flex:1}}>
+                                    <Text>Informasi Produk</Text>
+                                </View>
+                                <View style={{flex:1}}>
+                                    <Text>Total : Rp. {this.state.totalCalculate}</Text>
+                                </View>
+                            </View>
+                        </Separator>
+
+                        <List>
+                            <ListItem thumbnail>
+                                <Left />
+                                <Body>
+                                    <Text>{this.state.name_product}</Text>
+                                    {/* <Text note numberOfLines={1}>Its time to build a difference . .</Text> */}
+                                </Body>
+                                <Right>
+                                    <Input placeholder='Jumlah'
+                                        maxLength={3}
+                                        style={{marginBottom:-32}}
+                                        onChangeText={(text) => { [this.setState({totalItem:text}), this.totalCalculate(text*this.state.satuan_hrg_product) ] }}
+                                        keyboardType='numeric'/>
+                                </Right>
+                            </ListItem>
+                        </List>
+
+                        <View style={{flex: 1,flexDirection: 'row',alignItems: 'center',justifyContent: 'center'}}>
+                            <View style={{flex:1}}>
+                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgPcs}), this.totalCalculate(this.state.totalItem * this.state.itemHrgPcs)] }>
+                                    <Card
+                                        title={null}
+                                    >
+                                        <Text style={{ marginBottom: 10, alignSelf:"center"}}>
+                                            Harga pcs
+                                        </Text>
+                                        <Text style={{ marginBottom: 10, alignSelf:"center"}}>
+                                            Rp. {this.state.itemHrgPcs}
+                                        </Text>
+                                    </Card>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{flex:1}}>
+                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgDz}), this.totalCalculate(this.state.totalItem * this.state.itemHrgDz)] }>
+                                    <Card
+                                        title={null}
+                                    >
+                                        <Text style={{ marginBottom: 10, alignSelf:"center" }}>
+                                            Harga dus
+                                        </Text>
+                                        <Text style={{ marginBottom: 10, alignSelf:"center"}}>
+                                            Rp. {this.state.itemHrgDz}
+                                        </Text>
+                                    </Card>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        <View style={{flex: 1,flexDirection: 'row',alignItems: 'center',justifyContent: 'center'}}>
+                            <View style={{flex:1}}>
+                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgPck}), this.totalCalculate(this.state.totalItem * this.state.itemHrgPck)] }>
+                                    <Card
+                                        title={null}
+                                    >
+                                        <Text style={{ marginBottom: 10, alignSelf:"center"}}>
+                                            Harga pack
+                                        </Text>
+                                        <Text style={{ marginBottom: 10, alignSelf:"center"}}>
+                                            Rp. {this.state.itemHrgPck}
+                                        </Text>
+                                    </Card>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{flex:1}}>
+                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgBx}), this.totalCalculate(this.state.totalItem * this.state.itemHrgBx)] }>
+                                    <Card
+                                        title={null}
+                                    >
+                                        <Text style={{ marginBottom: 10, alignSelf:"center" }}>
+                                            Harga box
+                                        </Text>
+                                        <Text style={{ marginBottom: 10, alignSelf:"center"}}>
+                                            Rp. {this.state.itemHrgBx}
+                                        </Text>
+                                    </Card>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
                     </Content>
+
+                    <Footer>
+                        <FooterTab>
+                            <Button full>
+                                <Text>Tambahkan</Text>
+                            </Button>
+                        </FooterTab>
+                    </Footer>
 
                 </Tab>
 

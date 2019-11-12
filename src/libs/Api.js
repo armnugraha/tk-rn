@@ -1,7 +1,7 @@
 class Api {
 
     // DEV API
-    static host = 'http://192.168.100.4:8001';
+    static host = 'http://192.168.100.5:8001';
     // PROD API
     // static host = 'https://api.envisions.app/api/';
 
