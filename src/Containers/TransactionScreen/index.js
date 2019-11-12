@@ -183,7 +183,7 @@ export default class CameraScreen extends React.Component {
 
                 <Tab heading={ <TabHeading><Text>Tambah Barang</Text></TabHeading>}>
                     
-                    <View style={{height:"50%", marginBottom:20}}>
+                    <View style={{height:"50%"}}>
 				        {this.renderCamera()}
 			        </View>
 
@@ -191,7 +191,7 @@ export default class CameraScreen extends React.Component {
                         <Input placeholder='Rounded Textbox'/>
                     </Item>
                     <Content>
-                        
+
                     </Content>
 
                 </Tab>
