@@ -54,11 +54,13 @@ export default class CameraScreen extends React.Component {
         satuan_product:"",
         satuan_hrg_product:0,
 
-        totalCalculate:null,
+        totalCalculate:0,
         satuan_unit:"",
 
         // tab 2
         total_harga_keseluruhan:0,
+        jumlah_bayar:0,
+        jumlah_kembalian:0,
 	};
 
   toggleFlash() {
@@ -205,7 +207,7 @@ export default class CameraScreen extends React.Component {
   changeList(item){
 
     this.setState({name_product: item.name, itemHrgPcs:item.pcs_price, itemHrgDz:item.dozen_price, itemHrgPck:item.pack_price, itemHrgBx:item.box_price, 
-        totalCalculate: null, satuan_unit: null
+        totalCalculate: 0, satuan_unit: null
     })
   }
 
@@ -278,7 +280,7 @@ export default class CameraScreen extends React.Component {
                                     <Text>Informasi Produk</Text>
                                 </View>
                                 <View style={{flex:1}}>
-                                    <Text>Total : Rp. {this.state.totalCalculate} ({this.state.satuan_unit})</Text>
+                                    <Text>Total : Rp. {this.state.totalCalculate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ({this.state.satuan_unit})</Text>
                                 </View>
                             </View>
                         </Separator>
@@ -310,7 +312,7 @@ export default class CameraScreen extends React.Component {
                                             Harga pcs
                                         </Text>
                                         <Text style={{ marginBottom: 10, alignSelf:"center"}}>
-                                            Rp. {this.state.itemHrgPcs}
+                                            Rp. {this.state.itemHrgPcs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                         </Text>
                                     </Card>
                                 </TouchableOpacity>
@@ -324,7 +326,7 @@ export default class CameraScreen extends React.Component {
                                             Harga dus
                                         </Text>
                                         <Text style={{ marginBottom: 10, alignSelf:"center"}}>
-                                            Rp. {this.state.itemHrgDz}
+                                            Rp. {this.state.itemHrgDz.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                         </Text>
                                     </Card>
                                 </TouchableOpacity>
@@ -341,7 +343,7 @@ export default class CameraScreen extends React.Component {
                                             Harga pack
                                         </Text>
                                         <Text style={{ marginBottom: 10, alignSelf:"center"}}>
-                                            Rp. {this.state.itemHrgPck}
+                                            Rp. {this.state.itemHrgPck.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                         </Text>
                                     </Card>
                                 </TouchableOpacity>
@@ -355,7 +357,7 @@ export default class CameraScreen extends React.Component {
                                             Harga box
                                         </Text>
                                         <Text style={{ marginBottom: 10, alignSelf:"center"}}>
-                                            Rp. {this.state.itemHrgBx}
+                                            Rp. {this.state.itemHrgBx.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                         </Text>
                                     </Card>
                                 </TouchableOpacity>
@@ -364,12 +366,12 @@ export default class CameraScreen extends React.Component {
 
                     </Content>
 
-                    {this.state.totalCalculate != null && this.state.totalCalculate != 0 ?
+                    {this.state.totalCalculate != 0 ?
 
                         <Footer>
                             <FooterTab>
                                 <Button full onPress={() => this.setState({total_harga_keseluruhan: (this.state.total_harga_keseluruhan + this.state.totalCalculate),
-                                    totalCalculate: null, satuan_unit: null,
+                                    totalCalculate: 0, satuan_unit: null,
                                     listTransaction: [...this.state.listTransaction, {name: this.state.name_product, satuan_harga: this.state.satuan_hrg_product, satuan_product: this.state.satuan_unit, total_product: this.state.totalItem} ] }) }>
                                     <Text>Tambahkan</Text>
                                 </Button>
@@ -395,7 +397,7 @@ export default class CameraScreen extends React.Component {
                                             <Text note numberOfLines={1}>{item.total_product} ({item.satuan_product})</Text>
                                         </Body>
                                         <Right>
-                                            <Text>Rp. {item.satuan_harga}</Text>
+                                            <Text>Rp. {item.satuan_harga.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
                                         </Right>
                                     </ListItem>
                                 </List>
@@ -411,7 +413,7 @@ export default class CameraScreen extends React.Component {
                                     <Text>Total</Text>
                                 </Body>
                                 <Right>
-                                    <Text>Rp. {this.state.total_harga_keseluruhan}</Text>
+                                    <Text>Rp. {this.state.total_harga_keseluruhan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
                                 </Right>
                             </ListItem>
                             <ListItem thumbnail>
@@ -421,9 +423,8 @@ export default class CameraScreen extends React.Component {
                                 </Body>
                                 <Right>
                                     <Input placeholder='Jumlah'
-                                        maxLength={3}
                                         style={{marginBottom:-32}}
-                                        onChangeText={(text) => { [this.setState({totalItem:text}), this.totalCalculate(text*this.state.satuan_hrg_product) ] }}
+                                        onChangeText={(text) => { [this.setState({jumlah_bayar:text, jumlah_kembalian:this.state.total_harga_keseluruhan - text }) ] }}
                                         keyboardType='numeric'/>
                                 </Right>
                             </ListItem>
@@ -433,16 +434,12 @@ export default class CameraScreen extends React.Component {
                                     <Text>Kembalian</Text>
                                 </Body>
                                 <Right>
-                                    <Input placeholder='Jumlah'
-                                        maxLength={3}
-                                        style={{marginBottom:-32}}
-                                        onChangeText={(text) => { [this.setState({totalItem:text}), this.totalCalculate(text*this.state.satuan_hrg_product) ] }}
-                                        keyboardType='numeric'/>
+                                    <Text>Rp. {this.state.jumlah_kembalian.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
                                 </Right>
                             </ListItem>
                         </List>
 
-                        <Button onPress={() => this.setState({listTransaction: [...this.state.listTransaction, {name:"arman"} ] }) }>
+                        <Button full onPress={() => this.setState({listTransaction: [...this.state.listTransaction, {name:"arman"} ] }) }>
                             <Text>add1</Text>
                         </Button>
 
