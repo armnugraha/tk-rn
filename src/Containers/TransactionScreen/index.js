@@ -23,46 +23,62 @@ const flashModeOrder = {
 };
 
 export default class CameraScreen extends React.Component {
-	state = {
-		flash: 'off',
-		zoom: 0,
-		autoFocus: 'on',
-		autoFocusPoint: {
-			normalized: { x: 0.5, y: 0.5 }, // normalized values required for autoFocusPointOfInterest
-			drawRectPosition: {
-				x: Dimensions.get('window').width * 0.5 - 32,
-				y: Dimensions.get('window').height * 0.5 - 32,
-			},
-		},
-		depth: 0,
-		type: 'back',
-		whiteBalance: 'auto',
-		ratio: '16:9',
-		barcodes: [],
-        listTransaction: [],
-        loading:false,
-        itemProduct:[],
 
-        itemHrgPcs:0,
-        itemHrgDz:0,
-        itemHrgBx:0,
-        itemHrgPck:0,
-        
-        totalItem:0,
-        
-        name_product:"",
-        jml_product:0,
-        satuan_product:"",
-        satuan_hrg_product:0,
+    constructor(props) {
+        super(props);
 
-        totalCalculate:0,
-        satuan_unit:"",
+        this.state = {
+            flash: 'off',
+            zoom: 0,
+            autoFocus: 'on',
+            autoFocusPoint: {
+                normalized: { x: 0.5, y: 0.5 }, // normalized values required for autoFocusPointOfInterest
+                drawRectPosition: {
+                    x: Dimensions.get('window').width * 0.5 - 32,
+                    y: Dimensions.get('window').height * 0.5 - 32,
+                },
+            },
+            depth: 0,
+            type: 'back',
+            whiteBalance: 'auto',
+            ratio: '16:9',
+            barcodes: [],
+            listTransaction: [],
+            loading:false,
+            itemProduct:[],
+    
+            itemHrgPcs:0,
+            itemHrgDz:0,
+            itemHrgBx:0,
+            itemHrgPck:0,
+            
+            totalItem:0,
+            
+            name_product:"",
+            jml_product:0,
+            satuan_product:"",
+            satuan_hrg_product:0,
+    
+            totalCalculate:0,
+            satuan_unit:"",
+    
+            // tab 2
+            total_harga_keseluruhan:0,
+            jumlah_bayar:0,
+            jumlah_kembalian:0,
+            invoice_code:null,
+        };
 
-        // tab 2
-        total_harga_keseluruhan:0,
-        jumlah_bayar:0,
-        jumlah_kembalian:0,
-	};
+    }
+
+    componentDidMount(){
+        let thn = moment().format("YY")
+        let bln = moment().format("MM")
+        let hr = moment().format("DD")
+
+        let code = "INV-"+thn+"-"+Math.floor(Math.random() * 100)+"-"+bln+"-"+Math.floor(Math.random() * 10)+"-"+hr
+        this.setState({invoice_code:code})
+    }
 
     toggleFlash() {
         this.setState({
@@ -218,14 +234,8 @@ export default class CameraScreen extends React.Component {
 
     storeTransaksi(){
 
-        let thn = moment().format("YY")
-        let bln = moment().format("MM")
-        let hr = moment().format("DD")
-
-        let code = "INV-"+thn+"-"+Math.floor(Math.random() * 100)+"-"+bln+"-"+Math.floor(Math.random() * 10)+"-"+hr
-
         let params = {
-            invoice: code,
+            invoice: this.state.invoice_code,
             items: JSON.stringify(this.state.listTransaction),
             payment: this.state.jumlah_bayar,
             total: this.state.total_harga_keseluruhan,
@@ -432,6 +442,18 @@ export default class CameraScreen extends React.Component {
                         />
 
                         <List>
+
+                            <Separator bordered>
+                                <View style={{flex: 1,flexDirection: 'row',alignItems: 'center',justifyContent: 'center'}}>
+                                    <View style={{flex:1}}>
+                                        <Text>Informasi Transaksi</Text>
+                                    </View>
+                                    <View style={{flex:1}}>
+                                        <Text>Invoice {this.state.invoice_code}</Text>
+                                    </View>
+                                </View>
+                            </Separator>
+
                             <ListItem thumbnail>
                                 <Left />
                                 <Body>
