@@ -121,7 +121,7 @@ class MainScreen extends React.Component {
                   style={styles.btnStyle}
                   onPress={() => this._moveToECommerceDevelopment()}
                 >
-                  <Text style={styles.buttonText}>ECommerce Development</Text>
+                  <Text style={styles.buttonText}>List Transaksi</Text>
                 </TouchableOpacity>
               </View>
 
@@ -130,7 +130,7 @@ class MainScreen extends React.Component {
                   style={styles.btnStyle}
                   onPress={() => this.props.navigation.navigate("SelectStyle")}
                 >
-                  <Text style={styles.buttonText}>Music Material UI</Text>
+                  <Text style={styles.buttonText}>List Barang</Text>
                 </TouchableOpacity>
               </View>
 
