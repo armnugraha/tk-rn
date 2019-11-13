@@ -8,12 +8,12 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
   ToastAndroid,
-  ActivityIndicator
+  ActivityIndicator,
+  FlatList
 } from 'react-native';
 // eslint-disable-next-line import/no-unresolved
 import { RNCamera } from 'react-native-camera';
 import { Container, Header, Content, List, ListItem, Button, Tab, Tabs, TabHeading, Left, Body, Right, Title, Item, Input, Footer, FooterTab, Separator, Card, CardItem } from 'native-base';
-import { FlatList } from 'react-native-gesture-handler';
 import Api from '../../libs/Api';
 
 const flashModeOrder = {
@@ -38,7 +38,7 @@ export default class CameraScreen extends React.Component {
 		whiteBalance: 'auto',
 		ratio: '16:9',
 		barcodes: [],
-        listTransaction: [{name:"ar"}],
+        listTransaction: [],
         loading:false,
         itemProduct:[],
 
@@ -54,7 +54,11 @@ export default class CameraScreen extends React.Component {
         satuan_product:"",
         satuan_hrg_product:0,
 
-        totalCalculate:0,
+        totalCalculate:null,
+        satuan_unit:"",
+
+        // tab 2
+        total_harga_keseluruhan:0,
 	};
 
   toggleFlash() {
@@ -199,7 +203,10 @@ export default class CameraScreen extends React.Component {
   }
 
   changeList(item){
-      this.setState({name_product: item.name, itemHrgPcs:item.pcs_price, itemHrgDz:item.dozen_price, itemHrgPck:item.pack_price, itemHrgBx:item.box_price, })
+
+    this.setState({name_product: item.name, itemHrgPcs:item.pcs_price, itemHrgDz:item.dozen_price, itemHrgPck:item.pack_price, itemHrgBx:item.box_price, 
+        totalCalculate: null, satuan_unit: null
+    })
   }
 
   totalCalculate(value){
@@ -240,30 +247,26 @@ export default class CameraScreen extends React.Component {
 
                     <View style={{height:128}}>
 
-                        <Content>
+                        {this.renderLoading()}
 
-                            {this.renderLoading()}
+                        <FlatList
+                            extraData={this.state}
+                            data={this.state.itemProduct}
+                            renderItem = {({item, index}) => (
 
-                            <FlatList
-                                extraData={this.state}
-                                data={this.state.itemProduct}
-                                renderItem = {({item, index}) => (
+                                <TouchableOpacity
+                                    onPress={() => this.changeList(item)}
+                                >
+                                    <Card transparent>
+                                        <CardItem>
+                                            <Text>{item.name}</Text>
+                                        </CardItem>
+                                    </Card>
+                                </TouchableOpacity>
 
-                                    <TouchableOpacity
-                                        onPress={() => this.changeList(item)}
-                                    >
-                                        <Card transparent>
-                                            <CardItem>
-                                                <Text>{item.name}</Text>
-                                            </CardItem>
-                                        </Card>
-                                    </TouchableOpacity>
-
-                                )}
-                                keyExtractor = {(item, index) => index.toString()}
-                            />
-
-                        </Content>
+                            )}
+                            keyExtractor = {(item, index) => index.toString()}
+                        />
                         
                     </View>
 
@@ -275,7 +278,7 @@ export default class CameraScreen extends React.Component {
                                     <Text>Informasi Produk</Text>
                                 </View>
                                 <View style={{flex:1}}>
-                                    <Text>Total : Rp. {this.state.totalCalculate}</Text>
+                                    <Text>Total : Rp. {this.state.totalCalculate} ({this.state.satuan_unit})</Text>
                                 </View>
                             </View>
                         </Separator>
@@ -299,7 +302,7 @@ export default class CameraScreen extends React.Component {
 
                         <View style={{flex: 1,flexDirection: 'row',alignItems: 'center',justifyContent: 'center'}}>
                             <View style={{flex:1}}>
-                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgPcs}), this.totalCalculate(this.state.totalItem * this.state.itemHrgPcs)] }>
+                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgPcs, satuan_unit:"pcs"}), this.totalCalculate(this.state.totalItem * this.state.itemHrgPcs)] }>
                                     <Card
                                         title={null}
                                     >
@@ -313,7 +316,7 @@ export default class CameraScreen extends React.Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={{flex:1}}>
-                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgDz}), this.totalCalculate(this.state.totalItem * this.state.itemHrgDz)] }>
+                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgDz, satuan_unit:"dus"}), this.totalCalculate(this.state.totalItem * this.state.itemHrgDz)] }>
                                     <Card
                                         title={null}
                                     >
@@ -330,7 +333,7 @@ export default class CameraScreen extends React.Component {
 
                         <View style={{flex: 1,flexDirection: 'row',alignItems: 'center',justifyContent: 'center'}}>
                             <View style={{flex:1}}>
-                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgPck}), this.totalCalculate(this.state.totalItem * this.state.itemHrgPck)] }>
+                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgPck, satuan_unit:"pack"}), this.totalCalculate(this.state.totalItem * this.state.itemHrgPck)] }>
                                     <Card
                                         title={null}
                                     >
@@ -344,7 +347,7 @@ export default class CameraScreen extends React.Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={{flex:1}}>
-                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgBx}), this.totalCalculate(this.state.totalItem * this.state.itemHrgBx)] }>
+                                <TouchableOpacity onPress={() => [this.setState({satuan_hrg_product:this.state.itemHrgBx, satuan_unit:"box"}), this.totalCalculate(this.state.totalItem * this.state.itemHrgBx)] }>
                                     <Card
                                         title={null}
                                     >
@@ -361,26 +364,39 @@ export default class CameraScreen extends React.Component {
 
                     </Content>
 
-                    <Footer>
-                        <FooterTab>
-                            <Button full>
-                                <Text>Tambahkan</Text>
-                            </Button>
-                        </FooterTab>
-                    </Footer>
+                    {this.state.totalCalculate != null && this.state.totalCalculate != 0 ?
+
+                        <Footer>
+                            <FooterTab>
+                                <Button full onPress={() => this.setState({total_harga_keseluruhan: (this.state.total_harga_keseluruhan + this.state.totalCalculate),
+                                    totalCalculate: null, satuan_unit: null,
+                                    listTransaction: [...this.state.listTransaction, {name: this.state.name_product, satuan_harga: this.state.satuan_hrg_product, satuan_product: this.state.satuan_unit, total_product: this.state.totalItem} ] }) }>
+                                    <Text>Tambahkan</Text>
+                                </Button>
+                            </FooterTab>
+                        </Footer>
+
+                    : null
+                    }
 
                 </Tab>
 
                 <Tab heading={ <TabHeading><Text>List</Text></TabHeading>}>
                     
-                    <Content>
+                    {/* <Content> */}
 
                         <FlatList
                             data={this.state.listTransaction}
                             renderItem = {({item, index}) => (
-                                <List style={{backgroundColor:"red"}}>
+                                <List>
                                     <ListItem>
-                                        <Text>{item.name}</Text>
+                                        <Body>
+                                            <Text>{item.name}</Text>
+                                            <Text note numberOfLines={1}>{item.total_product} ({item.satuan_product})</Text>
+                                        </Body>
+                                        <Right>
+                                            <Text>Rp. {item.satuan_harga}</Text>
+                                        </Right>
                                     </ListItem>
                                 </List>
                             )
@@ -388,11 +404,49 @@ export default class CameraScreen extends React.Component {
                             keyExtractor = {(item, index) => index.toString()}
                         />
 
+                        <List>
+                            <ListItem thumbnail>
+                                <Left />
+                                <Body>
+                                    <Text>Total</Text>
+                                </Body>
+                                <Right>
+                                    <Text>Rp. {this.state.total_harga_keseluruhan}</Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem thumbnail>
+                                <Left />
+                                <Body>
+                                    <Text>Pembayaran</Text>
+                                </Body>
+                                <Right>
+                                    <Input placeholder='Jumlah'
+                                        maxLength={3}
+                                        style={{marginBottom:-32}}
+                                        onChangeText={(text) => { [this.setState({totalItem:text}), this.totalCalculate(text*this.state.satuan_hrg_product) ] }}
+                                        keyboardType='numeric'/>
+                                </Right>
+                            </ListItem>
+                            <ListItem thumbnail>
+                                <Left />
+                                <Body>
+                                    <Text>Kembalian</Text>
+                                </Body>
+                                <Right>
+                                    <Input placeholder='Jumlah'
+                                        maxLength={3}
+                                        style={{marginBottom:-32}}
+                                        onChangeText={(text) => { [this.setState({totalItem:text}), this.totalCalculate(text*this.state.satuan_hrg_product) ] }}
+                                        keyboardType='numeric'/>
+                                </Right>
+                            </ListItem>
+                        </List>
+
                         <Button onPress={() => this.setState({listTransaction: [...this.state.listTransaction, {name:"arman"} ] }) }>
                             <Text>add1</Text>
                         </Button>
 
-                    </Content>
+                    {/* </Content> */}
 
                 </Tab>
 
