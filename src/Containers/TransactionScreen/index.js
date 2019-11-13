@@ -15,6 +15,7 @@ import {
 import { RNCamera } from 'react-native-camera';
 import { Container, Header, Content, List, ListItem, Button, Tab, Tabs, TabHeading, Left, Body, Right, Title, Item, Input, Footer, FooterTab, Separator, Card, CardItem } from 'native-base';
 import Api from '../../libs/Api';
+import moment from 'moment'
 
 const flashModeOrder = {
   off: 'torch',
@@ -63,162 +64,186 @@ export default class CameraScreen extends React.Component {
         jumlah_kembalian:0,
 	};
 
-  toggleFlash() {
-    this.setState({
-      flash: flashModeOrder[this.state.flash],
-    });
-  }
-
-  toggleFocus() {
-    this.setState({
-      autoFocus: this.state.autoFocus === 'on' ? 'off' : 'on',
-    });
-  }
-
-  touchToFocus(event) {
-    const { pageX, pageY } = event.nativeEvent;
-    const screenWidth = Dimensions.get('window').width;
-    const screenHeight = Dimensions.get('window').height;
-    const isPortrait = screenHeight > screenWidth;
-
-    let x = pageX / screenWidth;
-    let y = pageY / screenHeight;
-    // Coordinate transform for portrait. See autoFocusPointOfInterest in docs for more info
-    if (isPortrait) {
-      x = pageY / screenHeight;
-      y = -(pageX / screenWidth) + 1;
+    toggleFlash() {
+        this.setState({
+        flash: flashModeOrder[this.state.flash],
+        });
     }
 
-    this.setState({
-      autoFocusPoint: {
-        normalized: { x, y },
-        drawRectPosition: { x: pageX, y: pageY },
-      },
-    });
-  }
+    toggleFocus() {
+        this.setState({
+        autoFocus: this.state.autoFocus === 'on' ? 'off' : 'on',
+        });
+    }
 
-  zoomOut() {
-    this.setState({
-      zoom: this.state.zoom - 0.1 < 0 ? 0 : this.state.zoom - 0.1,
-    });
-  }
+    touchToFocus(event) {
+        const { pageX, pageY } = event.nativeEvent;
+        const screenWidth = Dimensions.get('window').width;
+        const screenHeight = Dimensions.get('window').height;
+        const isPortrait = screenHeight > screenWidth;
 
-  zoomIn() {
-    this.setState({
-      zoom: this.state.zoom + 0.1 > 1 ? 1 : this.state.zoom + 0.1,
-    });
-  }
+        let x = pageX / screenWidth;
+        let y = pageY / screenHeight;
+        // Coordinate transform for portrait. See autoFocusPointOfInterest in docs for more info
+        if (isPortrait) {
+        x = pageY / screenHeight;
+        y = -(pageX / screenWidth) + 1;
+        }
 
-  setFocusDepth(depth) {
-    this.setState({
-      depth,
-    });
-  }
+        this.setState({
+        autoFocusPoint: {
+            normalized: { x, y },
+            drawRectPosition: { x: pageX, y: pageY },
+        },
+        });
+    }
 
-  onBarCodeRead = (e) => {alert("Barcode value is" + e.data, "Barcode type is" + e.type);}
+    zoomOut() {
+        this.setState({
+        zoom: this.state.zoom - 0.1 < 0 ? 0 : this.state.zoom - 0.1,
+        });
+    }
 
-  renderCamera() {
-    
-    const drawFocusRingPosition = {
-      top: this.state.autoFocusPoint.drawRectPosition.y - 152,
-      left: this.state.autoFocusPoint.drawRectPosition.x - 32,
-    };
-    return (
-      <RNCamera
-        ref={ref => {
-          this.camera = ref;
-        }}
-        style={{
-          flex: 1,
-          justifyContent: 'space-between',
-        }}
-        flashMode={this.state.flash}
-        onBarCodeRead={this.onBarCodeRead}
-        autoFocus={this.state.autoFocus}
-        autoFocusPointOfInterest={this.state.autoFocusPoint.normalized}
-        zoom={this.state.zoom}
-        focusDepth={this.state.depth}
-        androidCameraPermissionOptions={{
-          title: 'Permission to use camera',
-          message: 'We need your permission to use your camera',
-          buttonPositive: 'Ok',
-          buttonNegative: 'Cancel',
-        }}
-      >
-        <View style={StyleSheet.absoluteFill}>
-          <View style={[styles.autoFocusBox, drawFocusRingPosition]} />
-          <TouchableWithoutFeedback onPress={this.touchToFocus.bind(this)}>
-            <View style={{ flex: 1 }} />
-          </TouchableWithoutFeedback>
-        </View>
+    zoomIn() {
+        this.setState({
+        zoom: this.state.zoom + 0.1 > 1 ? 1 : this.state.zoom + 0.1,
+        });
+    }
 
+    setFocusDepth(depth) {
+        this.setState({
+        depth,
+        });
+    }
 
-        <View style={{ bottom: 0 }}>
-          {this.state.zoom !== 0 && (
-            <Text style={[styles.flipText, styles.zoomText]}>Zoom: {this.state.zoom}</Text>
-          )}
-          <View
-            style={{
-			  height: 56,
-			  bottom:0,
-              backgroundColor: 'transparent',
-              flexDirection: 'row',
-              alignSelf: 'flex-end',
+    onBarCodeRead = (e) => {alert("Barcode value is" + e.data, "Barcode type is" + e.type);}
+
+    renderCamera() {
+        
+        const drawFocusRingPosition = {
+        top: this.state.autoFocusPoint.drawRectPosition.y - 152,
+        left: this.state.autoFocusPoint.drawRectPosition.x - 32,
+        };
+        return (
+        <RNCamera
+            ref={ref => {
+            this.camera = ref;
             }}
-          >
-			<TouchableOpacity
-              style={[styles.flipButton, { flex: 0.1, alignSelf: 'flex-end' }]}
-              onPress={this.toggleFlash.bind(this)}
+            style={{
+            flex: 1,
+            justifyContent: 'space-between',
+            }}
+            flashMode={this.state.flash}
+            onBarCodeRead={this.onBarCodeRead}
+            autoFocus={this.state.autoFocus}
+            autoFocusPointOfInterest={this.state.autoFocusPoint.normalized}
+            zoom={this.state.zoom}
+            focusDepth={this.state.depth}
+            androidCameraPermissionOptions={{
+            title: 'Permission to use camera',
+            message: 'We need your permission to use your camera',
+            buttonPositive: 'Ok',
+            buttonNegative: 'Cancel',
+            }}
+        >
+            <View style={StyleSheet.absoluteFill}>
+            <View style={[styles.autoFocusBox, drawFocusRingPosition]} />
+            <TouchableWithoutFeedback onPress={this.touchToFocus.bind(this)}>
+                <View style={{ flex: 1 }} />
+            </TouchableWithoutFeedback>
+            </View>
+
+
+            <View style={{ bottom: 0 }}>
+            {this.state.zoom !== 0 && (
+                <Text style={[styles.flipText, styles.zoomText]}>Zoom: {this.state.zoom}</Text>
+            )}
+            <View
+                style={{
+                height: 56,
+                bottom:0,
+                backgroundColor: 'transparent',
+                flexDirection: 'row',
+                alignSelf: 'flex-end',
+                }}
             >
-              <Text style={styles.flipText}> Flash </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.flipButton, { flex: 0.1, alignSelf: 'flex-end' }]}
-              onPress={this.zoomIn.bind(this)}
-            >
-              <Text style={styles.flipText}> + </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.flipButton, { flex: 0.1, alignSelf: 'flex-end' }]}
-              onPress={this.zoomOut.bind(this)}
-            >
-              <Text style={styles.flipText}> - </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </RNCamera>
-    );
-  }
+                <TouchableOpacity
+                style={[styles.flipButton, { flex: 0.1, alignSelf: 'flex-end' }]}
+                onPress={this.toggleFlash.bind(this)}
+                >
+                <Text style={styles.flipText}> Flash </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                style={[styles.flipButton, { flex: 0.1, alignSelf: 'flex-end' }]}
+                onPress={this.zoomIn.bind(this)}
+                >
+                <Text style={styles.flipText}> + </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                style={[styles.flipButton, { flex: 0.1, alignSelf: 'flex-end' }]}
+                onPress={this.zoomOut.bind(this)}
+                >
+                <Text style={styles.flipText}> - </Text>
+                </TouchableOpacity>
+            </View>
+            </View>
+        </RNCamera>
+        );
+    }
 
-  getProduct(value){
+    getProduct(value){
 
-    this.setState({loading:true})
+        this.setState({loading:true})
 
-    Api.get("/api/v1/getProduct/" + value).then(resp =>{
-        this.setState({itemProduct: resp.data})
-        this.setState({loading:false})
-    })
-    .catch(error =>{
-        ToastAndroid.show("'"+error+"'", ToastAndroid.SHORT)
-    });
+        Api.get("/api/v1/getProduct/" + value).then(resp =>{
+            this.setState({itemProduct: resp.data})
+            this.setState({loading:false})
+        })
+        .catch(error =>{
+            ToastAndroid.show("'"+error+"'", ToastAndroid.SHORT)
+        });
 
-  }
+    }
 
-  changeList(item){
+    changeList(item){
 
-    this.setState({name_product: item.name, itemHrgPcs:item.pcs_price, itemHrgDz:item.dozen_price, itemHrgPck:item.pack_price, itemHrgBx:item.box_price, 
-        totalCalculate: 0, satuan_unit: null
-    })
-  }
+        this.setState({name_product: item.name, itemHrgPcs:item.pcs_price, itemHrgDz:item.dozen_price, itemHrgPck:item.pack_price, itemHrgBx:item.box_price, 
+            totalCalculate: 0, satuan_unit: null
+        })
+    }
 
-  totalCalculate(value){
-      this.setState({totalCalculate: value})
-  }
+    totalCalculate(value){
+        this.setState({totalCalculate: value})
+    }
 
-  renderLoading(){
-      if(this.state.loading)
-        return <ActivityIndicator />
-  }
+    storeTransaksi(){
+
+        let thn = moment().format("YY")
+        let bln = moment().format("MM")
+        let hr = moment().format("DD")
+
+        let code = "INV-"+thn+"-"+Math.floor(Math.random() * 100)+"-"+bln+"-"+Math.floor(Math.random() * 10)+"-"+hr
+
+        let params = {
+            invoice: code,
+            items: JSON.stringify(this.state.listTransaction),
+            payment: this.state.jumlah_bayar,
+            total: this.state.total_harga_keseluruhan,
+            kembalian: this.state.jumlah_kembalian,
+        };
+
+        return Api.post('/api/v1/create_transaction', params).then(resp =>{
+            alert(JSON.stringify(resp))
+        })
+        .catch(error =>{
+            alert(JSON.stringify(error))
+        });
+    }
+
+    renderLoading(){
+        if(this.state.loading)
+            return <ActivityIndicator />
+    }
 
   render() {
     return (
@@ -439,8 +464,8 @@ export default class CameraScreen extends React.Component {
                             </ListItem>
                         </List>
 
-                        <Button full onPress={() => this.setState({listTransaction: [...this.state.listTransaction, {name:"arman"} ] }) }>
-                            <Text>add1</Text>
+                        <Button full onPress={() => this.storeTransaksi() }>
+                            <Text>Tambah</Text>
                         </Button>
 
                     {/* </Content> */}
