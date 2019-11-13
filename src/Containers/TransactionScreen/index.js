@@ -208,7 +208,7 @@ export default class CameraScreen extends React.Component {
     changeList(item){
 
         this.setState({name_product: item.name, itemHrgPcs:item.pcs_price, itemHrgDz:item.dozen_price, itemHrgPck:item.pack_price, itemHrgBx:item.box_price, 
-            totalCalculate: 0, satuan_unit: null
+            totalCalculate: 0, satuan_unit: null, satuan_hrg_product:0
         })
     }
 
@@ -396,8 +396,8 @@ export default class CameraScreen extends React.Component {
                         <Footer>
                             <FooterTab>
                                 <Button full onPress={() => this.setState({total_harga_keseluruhan: (this.state.total_harga_keseluruhan + this.state.totalCalculate),
-                                    totalCalculate: 0, satuan_unit: null,
-                                    listTransaction: [...this.state.listTransaction, {name: this.state.name_product, satuan_harga: this.state.satuan_hrg_product, satuan_product: this.state.satuan_unit, total_product: this.state.totalItem} ] }) }>
+                                    totalCalculate: 0, satuan_unit: null, satuan_hrg_product:0,
+                                    listTransaction: [...this.state.listTransaction, {name: this.state.name_product, unit: this.state.satuan_unit, price: this.state.satuan_hrg_product, qty: this.state.totalItem, item_discount:0, item_discount_subtotal:0, subtotal:this.state.totalCalculate} ] }) }>
                                     <Text>Tambahkan</Text>
                                 </Button>
                             </FooterTab>
@@ -419,10 +419,10 @@ export default class CameraScreen extends React.Component {
                                     <ListItem>
                                         <Body>
                                             <Text>{item.name}</Text>
-                                            <Text note numberOfLines={1}>{item.total_product} ({item.satuan_product})</Text>
+                                            <Text note numberOfLines={1}>{item.qty} ({item.unit})</Text>
                                         </Body>
                                         <Right>
-                                            <Text>Rp. {item.satuan_harga.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                                            <Text>Rp. {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
                                         </Right>
                                     </ListItem>
                                 </List>
