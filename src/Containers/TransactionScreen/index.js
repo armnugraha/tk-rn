@@ -17,6 +17,7 @@ import { RNCamera } from 'react-native-camera';
 import { Container, Header, Content, List, ListItem, Button, Tab, Tabs, TabHeading, Left, Body, Right, Title, Item, Input, Footer, FooterTab, Separator, Card, CardItem, Icon } from 'native-base';
 import Api from '../../libs/Api';
 import moment from 'moment'
+import { Actions } from 'react-native-router-flux';
 
 const flashModeOrder = {
   off: 'torch',
@@ -253,7 +254,9 @@ export default class CameraScreen extends React.Component {
         };
 
         return Api.post('/api/v1/create_transaction', params).then(resp =>{
-            alert(JSON.stringify(resp))
+            // alert(JSON.stringify(resp))
+            ToastAndroid.show("Transaksi Berhasil Disimpan", ToastAndroid.SHORT)
+            Actions.pop()
         })
         .catch(error =>{
             alert(JSON.stringify(error))
@@ -534,7 +537,7 @@ export default class CameraScreen extends React.Component {
                         <View style={{flexDirection: 'row',alignItems: 'center',justifyContent: 'center'}}>
                             <Left>
                                 <Button full onPress={() => this.storeTransaksi() }>
-                                    <Text>Tambah</Text>
+                                    <Text>Simpan</Text>
                                 </Button>
                             </Left>
                             <Right style={{borderLeftColor:"white"}}>
