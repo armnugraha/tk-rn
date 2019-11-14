@@ -46,13 +46,16 @@ export default class CameraScreen extends React.Component {
             // {name: "I",
             // price: 2000,
             // qty:2,
+            // subtotal: 5000,
             // unit:"pcs"}
             listTransaction: [{name: "I",
             price: 2000,
             qty:2,
+            subtotal: 5000,
             unit:"pcs"},{name: "I2",
             price: 2000,
             qty:2,
+            subtotal: 10000,
             unit:"pcs"}],
             loading:false,
             itemProduct:[],
@@ -264,6 +267,12 @@ export default class CameraScreen extends React.Component {
         var array = [...this.state.listTransaction]; // make a separate copy of the array
 
         array = array.filter( el => el.name !== e )
+
+        var msgTotal = array.reduce(function(prev, cur) {
+            return prev + cur.subtotal;
+        }, 0);
+
+        alert(msgTotal)
 
         this.setState({listTransaction: array});
     }
