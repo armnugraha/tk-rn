@@ -9,7 +9,8 @@ import {
   Dimensions,
   ToastAndroid,
   ActivityIndicator,
-  FlatList
+  FlatList,
+  Alert
 } from 'react-native';
 // eslint-disable-next-line import/no-unresolved
 import { RNCamera } from 'react-native-camera';
@@ -47,16 +48,12 @@ export default class CameraScreen extends React.Component {
             // price: 2000,
             // qty:2,
             // subtotal: 5000,
+            // unit:"pcs"},{name: "I2",
+            // price: 2000,
+            // qty:2,
+            // subtotal: 10000,
             // unit:"pcs"}
-            listTransaction: [{name: "I",
-            price: 2000,
-            qty:2,
-            subtotal: 5000,
-            unit:"pcs"},{name: "I2",
-            price: 2000,
-            qty:2,
-            subtotal: 10000,
-            unit:"pcs"}],
+            listTransaction: [],
             loading:false,
             itemProduct:[],
     
@@ -264,6 +261,21 @@ export default class CameraScreen extends React.Component {
     }
 
     removeListObject(e){
+
+        Alert.alert(
+            "Hapus Barang?",
+            "Apakah anda yakin ingin menghapusnya?",
+            [
+              { text: "Yes", onPress: () => this.removeListAction(e) },
+              { text: "No", onPress: () => true }
+            ],
+            { cancelable: true }
+          );
+        
+          return true;
+    }
+
+    removeListAction(e){
         var array = [...this.state.listTransaction]; // make a separate copy of the array
 
         array = array.filter( el => el.name !== e )
@@ -272,9 +284,7 @@ export default class CameraScreen extends React.Component {
             return prev + cur.subtotal;
         }, 0);
 
-        alert(msgTotal)
-
-        this.setState({listTransaction: array});
+        this.setState({listTransaction: array, total_harga_keseluruhan:msgTotal, jumlah_kembalian:msgTotal-this.state.jumlah_bayar});
     }
 
     renderLoading(){
@@ -434,6 +444,7 @@ export default class CameraScreen extends React.Component {
                             <FooterTab>
                                 <Button full onPress={() => this.setState({total_harga_keseluruhan: (this.state.total_harga_keseluruhan + this.state.totalCalculate),
                                     totalCalculate: 0, satuan_unit: null, satuan_hrg_product:0,
+                                    jumlah_kembalian:(this.state.total_harga_keseluruhan + this.state.totalCalculate)-this.state.jumlah_bayar,
                                     listTransaction: [...this.state.listTransaction, {name: this.state.name_product, unit: this.state.satuan_unit, price: this.state.satuan_hrg_product, qty: this.state.totalItem, item_discount:0, item_discount_subtotal:0, subtotal:this.state.totalCalculate} ] }) }>
                                     <Text>Tambahkan</Text>
                                 </Button>
@@ -447,7 +458,7 @@ export default class CameraScreen extends React.Component {
 
                 <Tab heading={ <TabHeading><Text>List</Text></TabHeading>}>
                     
-                    {/* <Content> */}
+                    
 
                         <FlatList
                             data={this.state.listTransaction}
@@ -456,7 +467,7 @@ export default class CameraScreen extends React.Component {
                                     <ListItem>
                                         <Body>
                                             <Text>{item.name} (Rp. {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")})</Text>
-                                            <Text note numberOfLines={1}>{item.qty} ({item.unit})</Text>
+                                            <Text note numberOfLines={1}>{item.qty} ({item.unit}) Sub (Rp. {item.subtotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")})</Text>
                                         </Body>
                                         <Right>
                                             <Button style={{ backgroundColor: "#c70d3a" }} onPress={() => this.removeListObject(item.name)}>
@@ -469,6 +480,7 @@ export default class CameraScreen extends React.Component {
                             }
                             keyExtractor = {(item, index) => index.toString()}
                         />
+                    {/* <Content> */}
 
                         <List>
 
@@ -507,17 +519,30 @@ export default class CameraScreen extends React.Component {
                             <ListItem thumbnail>
                                 <Left />
                                 <Body>
-                                    <Text>Kembalian</Text>
+                                    {this.state.jumlah_kembalian > 0 ? 
+                                        <Text>Sisa</Text>
+                                    :
+                                        <Text>Kembalian</Text>
+                                    }
                                 </Body>
                                 <Right>
                                     <Text>Rp. {this.state.jumlah_kembalian.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
                                 </Right>
                             </ListItem>
                         </List>
-
-                        <Button full onPress={() => this.storeTransaksi() }>
-                            <Text>Tambah</Text>
-                        </Button>
+                        
+                        <View style={{flexDirection: 'row',alignItems: 'center',justifyContent: 'center'}}>
+                            <Left>
+                                <Button full onPress={() => this.storeTransaksi() }>
+                                    <Text>Tambah</Text>
+                                </Button>
+                            </Left>
+                            <Right style={{borderLeftColor:"white"}}>
+                                <Button full onPress={() => null }>
+                                    <Text>Print</Text>
+                                </Button>
+                            </Right>
+                        </View>
 
                     {/* </Content> */}
 
