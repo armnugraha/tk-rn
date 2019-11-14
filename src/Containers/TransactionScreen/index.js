@@ -263,7 +263,7 @@ export default class CameraScreen extends React.Component {
     removeListObject(e){
 
         Alert.alert(
-            "Hapus Barang?",
+            "Semua Nama Barang yang ada di list akan di hapus?",
             "Apakah anda yakin ingin menghapusnya?",
             [
               { text: "Yes", onPress: () => this.removeListAction(e) },
