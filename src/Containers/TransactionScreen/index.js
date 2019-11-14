@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 // eslint-disable-next-line import/no-unresolved
 import { RNCamera } from 'react-native-camera';
-import { Container, Header, Content, List, ListItem, Button, Tab, Tabs, TabHeading, Left, Body, Right, Title, Item, Input, Footer, FooterTab, Separator, Card, CardItem } from 'native-base';
+import { Container, Header, Content, List, ListItem, Button, Tab, Tabs, TabHeading, Left, Body, Right, Title, Item, Input, Footer, FooterTab, Separator, Card, CardItem, Icon } from 'native-base';
 import Api from '../../libs/Api';
 import moment from 'moment'
 
@@ -43,7 +43,17 @@ export default class CameraScreen extends React.Component {
             whiteBalance: 'auto',
             ratio: '16:9',
             barcodes: [],
-            listTransaction: [],
+            // {name: "I",
+            // price: 2000,
+            // qty:2,
+            // unit:"pcs"}
+            listTransaction: [{name: "I",
+            price: 2000,
+            qty:2,
+            unit:"pcs"},{name: "I2",
+            price: 2000,
+            qty:2,
+            unit:"pcs"}],
             loading:false,
             itemProduct:[],
     
@@ -250,6 +260,14 @@ export default class CameraScreen extends React.Component {
         });
     }
 
+    removeListObject(e){
+        var array = [...this.state.listTransaction]; // make a separate copy of the array
+
+        array = array.filter( el => el.name !== e )
+
+        this.setState({listTransaction: array});
+    }
+
     renderLoading(){
         if(this.state.loading)
             return <ActivityIndicator />
@@ -428,11 +446,13 @@ export default class CameraScreen extends React.Component {
                                 <List>
                                     <ListItem>
                                         <Body>
-                                            <Text>{item.name}</Text>
+                                            <Text>{item.name} (Rp. {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")})</Text>
                                             <Text note numberOfLines={1}>{item.qty} ({item.unit})</Text>
                                         </Body>
                                         <Right>
-                                            <Text>Rp. {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                                            <Button style={{ backgroundColor: "#c70d3a" }} onPress={() => this.removeListObject(item.name)}>
+                                                <Icon active name="trash" />
+                                            </Button>
                                         </Right>
                                     </ListItem>
                                 </List>
